@@ -127,6 +127,31 @@ const Hero = () => {
             description: error.message,
             duration: 3000,
           });
+        },
+        onPermissionDenied: () => {
+          setIsListening(false);
+          toast.error("Microphone access denied", {
+            description: "Please allow microphone access in your browser settings to use voice search.",
+            duration: 5000,
+            action: {
+              label: "Open Settings",
+              onClick: () => {
+                // Open browser settings
+                if (navigator.permissions && navigator.permissions.query) {
+                  navigator.permissions.query({ name: 'microphone' as PermissionName })
+                    .then(permissionStatus => {
+                      if (permissionStatus.state === 'denied') {
+                        // Show instructions for enabling microphone
+                        toast.info("To enable microphone access:", {
+                          description: "1. Click the lock/info icon in your browser's address bar\n2. Find 'Microphone' in the site settings\n3. Change it to 'Allow'",
+                          duration: 8000,
+                        });
+                      }
+                    });
+                }
+              },
+            },
+          });
         }
       });
     } else {

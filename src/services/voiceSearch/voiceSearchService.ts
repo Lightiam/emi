@@ -11,6 +11,7 @@ export interface VoiceSearchOptions {
   onInterimResult?: (text: string) => void;
   onResult?: (text: string) => void;
   onError?: (error: Error) => void;
+  onPermissionDenied?: () => void;
 }
 
 interface SpeechRecognitionEvent extends Event {
@@ -71,10 +72,24 @@ class VoiceSearchService {
     }
   }
   
-  start(options: VoiceSearchOptions = {}) {
+  async start(options: VoiceSearchOptions = {}) {
     if (!this.recognition) {
       if (options.onError) {
         options.onError(new Error('Speech recognition not supported in this browser'));
+      }
+      return;
+    }
+
+    // Check for microphone permission
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(track => track.stop()); // Stop the stream after permission check
+    } catch (error) {
+      if (options.onPermissionDenied) {
+        options.onPermissionDenied();
+      }
+      if (options.onError) {
+        options.onError(new Error('Microphone access denied. Please allow microphone access in your browser settings.'));
       }
       return;
     }
@@ -104,7 +119,33 @@ class VoiceSearchService {
     this.recognition.onerror = (event) => {
       console.error('Speech recognition error', event.error);
       if (this.options.onError) {
-        this.options.onError(new Error(event.error));
+        let errorMessage = 'An error occurred with voice recognition.';
+        switch (event.error) {
+          case 'not-allowed':
+            errorMessage = 'Microphone access denied. Please allow microphone access in your browser settings.';
+            break;
+          case 'no-speech':
+            errorMessage = 'No speech was detected. Please try again.';
+            break;
+          case 'aborted':
+            errorMessage = 'Voice recognition was aborted.';
+            break;
+          case 'audio-capture':
+            errorMessage = 'No microphone was found. Please connect a microphone and try again.';
+            break;
+          case 'network':
+            errorMessage = 'Network error occurred. Please check your connection.';
+            break;
+          case 'not-allowed':
+            errorMessage = 'Microphone access denied. Please allow microphone access in your browser settings.';
+            break;
+          case 'service-not-available':
+            errorMessage = 'Voice recognition service is not available. Please try again later.';
+            break;
+          default:
+            errorMessage = `Voice recognition error: ${event.error}`;
+        }
+        this.options.onError(new Error(errorMessage));
       }
     };
     
