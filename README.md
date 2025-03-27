@@ -1,69 +1,108 @@
-# Welcome to your Lovable project
+# Dream Team Finder
 
-## Project info
+A modern web application for finding and connecting with skilled professionals, featuring voice recognition capabilities.
 
-**URL**: https://lovable.dev/projects/8998a956-dffe-4050-b5d6-fec34adc7bdc
+## Features
 
-## How can I edit this code?
+- 🔍 Advanced search functionality
+- 🎤 Voice recognition for hands-free searching
+- 🌐 Multi-language support
+- 📱 Responsive design
+- 🔒 Secure authentication
+- 🎨 Modern UI with Tailwind CSS
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- Shadcn UI Components
+- React Query
+- React Router DOM
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/8998a956-dffe-4050-b5d6-fec34adc7bdc) and start prompting.
+## Prerequisites
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js 20.x or higher
+- npm 10.x or higher
+- Git
 
-**Use your preferred IDE**
+## Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Lightiam/emi.git
+   cd emi
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Follow these steps:
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+4. Open your browser and navigate to `http://localhost:8080`
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## Development
 
-# Step 3: Install the necessary dependencies.
-npm i
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+## Deployment
+
+### Netlify Deployment
+
+1. Create a new site on Netlify
+2. Connect your GitHub repository
+3. Configure build settings:
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+4. Add environment variables in Netlify:
+   - `VITE_API_URL` - Your API URL
+   - `VITE_GROQ_API_KEY` - Your GROQ API key
+
+### Manual Deployment
+
+1. Build the project:
+   ```bash
+   npm run build
+   ```
+
+2. Deploy the contents of the `dist` directory to your hosting service
+
+## Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+VITE_API_URL=your_api_url
+VITE_GROQ_API_KEY=your_groq_api_key
 ```
 
-**Edit a file directly in GitHub**
+## Contributing
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-**Use GitHub Codespaces**
+## License
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## What technologies are used for this project?
+## Support
 
-This project is built with .
+For support, please open an issue in the GitHub repository or contact the maintainers.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Acknowledgments
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/8998a956-dffe-4050-b5d6-fec34adc7bdc) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+- [Shadcn UI](https://ui.shadcn.com/) for the beautiful components
+- [Tailwind CSS](https://tailwindcss.com/) for the styling system
+- [Vite](https://vitejs.dev/) for the build tool
