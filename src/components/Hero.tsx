@@ -130,20 +130,77 @@ const Hero = () => {
         },
         onPermissionDenied: () => {
           setIsListening(false);
-          // Show a more user-friendly popup with instructions
+          // Show a more user-friendly popup with browser-specific instructions
           toast.error("Microphone Access Required", {
             description: (
-              <div className="space-y-2">
-                <p>To use voice search, we need microphone access.</p>
-                <ol className="list-decimal list-inside space-y-1">
-                  <li>Click the lock/info icon in your browser's address bar</li>
-                  <li>Find 'Microphone' in the site settings</li>
-                  <li>Change it to 'Allow'</li>
-                  <li>Refresh the page</li>
-                </ol>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <svg className="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 15C13.6569 15 15 13.6569 15 12V6C15 4.34315 13.6569 3 12 3C10.3431 3 9 4.34315 9 6V12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M19 10V12C19 15.866 15.866 19 12 19C8.13401 19 5 15.866 5 12V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <span>To use voice search, we need microphone access</span>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm font-medium">1</div>
+                    <div>
+                      <p className="font-medium">Click the lock/info icon</p>
+                      <p className="text-sm text-gray-500">Located in your browser's address bar (top-left)</p>
+                      <div className="mt-1 flex gap-2">
+                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">Chrome: 🔒</span>
+                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">Firefox: 🛡️</span>
+                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">Edge: 🔒</span>
+                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">Safari: 🌐</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm font-medium">2</div>
+                    <div>
+                      <p className="font-medium">Find 'Microphone' settings</p>
+                      <p className="text-sm text-gray-500">Look for the microphone icon or text in site settings</p>
+                      <div className="mt-1 flex gap-2">
+                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">🎤 Microphone</span>
+                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">🎙️ Voice</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm font-medium">3</div>
+                    <div>
+                      <p className="font-medium">Change to 'Allow'</p>
+                      <p className="text-sm text-gray-500">Select 'Allow' from the dropdown menu</p>
+                      <div className="mt-1 flex gap-2">
+                        <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">✓ Allow</span>
+                        <span className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded">✗ Block</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm font-medium">4</div>
+                    <div>
+                      <p className="font-medium">Refresh the page</p>
+                      <p className="text-sm text-gray-500">Click the refresh button or press F5</p>
+                      <div className="mt-1 flex gap-2">
+                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">🔄 Refresh</span>
+                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">F5</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-sm text-gray-500 bg-blue-50 p-3 rounded-lg">
+                  <p className="font-medium text-blue-700 mb-1">Browser-specific tips:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Chrome: Look for the camera icon in the address bar</li>
+                    <li>Firefox: Click the shield icon in the address bar</li>
+                    <li>Edge: Look for the lock icon in the address bar</li>
+                    <li>Safari: Click the website icon in the address bar</li>
+                  </ul>
+                </div>
               </div>
             ),
-            duration: 8000,
+            duration: 15000,
             action: {
               label: "Open Settings",
               onClick: () => {
@@ -153,7 +210,7 @@ const Hero = () => {
                     .then(permissionStatus => {
                       if (permissionStatus.state === 'denied') {
                         // Show instructions for enabling microphone
-                        toast.info("To enable microphone access:", {
+                        toast.info("Browser Settings", {
                           description: (
                             <div className="space-y-2">
                               <p>Follow these steps to enable microphone access:</p>
