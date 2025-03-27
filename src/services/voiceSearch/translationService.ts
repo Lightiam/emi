@@ -1,3 +1,6 @@
+import { translateToEnglish, translateFromEnglish, detectLanguage } from '../translation/googleTranslate';
+
+export { translateToEnglish, translateFromEnglish, detectLanguage };
 
 // Translation functions (simulated)
 export const translateToEnglish = (text: string, fromLanguage: string): string => {
