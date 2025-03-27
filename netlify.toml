@@ -6,6 +6,8 @@
 [build.environment]
   NODE_VERSION = "20"
   NPM_VERSION = "10"
+  VITE_API_URL = "https://api.dreamteamfinder.com"
+  VITE_GROQ_API_KEY = "sk-1234567890abcdefghijklmnopqrstuvwxyz"
 
 [[redirects]]
   from = "/*"
