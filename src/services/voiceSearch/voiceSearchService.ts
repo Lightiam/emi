@@ -9,6 +9,7 @@ interface VoiceSearchOptions {
   language?: string;
   location?: string;
   translateToEnglish?: boolean;
+  query?: string;
   onInterimResult?: (text: string) => void;
   onResult?: (text: string) => void;
   onError?: (error: Error) => void;
@@ -82,6 +83,7 @@ interface ServiceProvider {
   rating: number;
   location: string;
   imageUrl: string;
+  [key: string]: unknown; // Add index signature
 }
 
 declare global {
@@ -162,6 +164,16 @@ class VoiceSearchService {
       return;
     }
 
+    // If already listening, stop first
+    if (this.isListening) {
+      this.stop();
+      // Wait a bit before starting again
+      setTimeout(() => {
+        this.start(options);
+      }, 100);
+      return;
+    }
+
     this.onResultCallback = options.onResult;
     this.onErrorCallback = options.onError;
     this.onPermissionDeniedCallback = options.onPermissionDenied;
@@ -182,8 +194,12 @@ class VoiceSearchService {
 
   stop() {
     if (this.recognition && this.isListening) {
-      this.recognition.stop();
-      this.isListening = false;
+      try {
+        this.recognition.stop();
+        this.isListening = false;
+      } catch (error) {
+        console.error('Error stopping recognition:', error);
+      }
     }
   }
 
@@ -191,7 +207,7 @@ class VoiceSearchService {
     return !!this.recognition;
   }
   
-  async searchWithVoice(options: VoiceSearchOptions = {}): Promise<Array<Record<string, unknown>>> {
+  async searchWithVoice(options: VoiceSearchOptions = {}): Promise<ServiceProvider[]> {
     if (!this.isSupported()) {
       console.warn('Speech recognition is not supported in this browser');
       return [];
@@ -216,11 +232,11 @@ class VoiceSearchService {
           
           // Use GROQ for advanced search or fall back to regular search
           try {
-            const results = await searchWithGroq(searchQuery, detectedLanguage);
+            const results = await searchWithGroq(searchQuery, detectedLanguage) as ServiceProvider[];
             resolve(results);
           } catch (error) {
             console.error('Error with AI search, falling back to regular search', error);
-            const results = await searchWorkers(searchQuery);
+            const results = await searchWorkers(searchQuery) as ServiceProvider[];
             resolve(results);
           }
         }

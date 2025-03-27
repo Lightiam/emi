@@ -31,6 +31,7 @@ const Hero = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [isListening, setIsListening] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('auto');
   const [detectedLocation, setDetectedLocation] = useState<string | null>(null);
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
@@ -108,17 +109,22 @@ const Hero = () => {
 
   // Voice recognition with multilingual support
   const toggleVoiceRecognition = () => {
+    if (isProcessing) return; // Prevent multiple clicks while processing
+    
     if (!isListening) {
+      setIsProcessing(true);
       setIsListening(true);
       
       voiceSearchInstance.start({
         onResult: (text) => {
           setQuery(text);
           setIsListening(false);
+          setIsProcessing(false);
           handleSearch(null, text);
         },
         onError: (error) => {
           setIsListening(false);
+          setIsProcessing(false);
           toast.error("Voice recognition failed", {
             description: error.message,
             duration: 3000,
@@ -126,6 +132,7 @@ const Hero = () => {
         },
         onPermissionDenied: () => {
           setIsListening(false);
+          setIsProcessing(false);
           toast.error("Microphone Access Required", {
             description: (
               <div className="space-y-4">
@@ -142,12 +149,6 @@ const Hero = () => {
                     <div>
                       <p className="font-medium">Click the lock/info icon</p>
                       <p className="text-sm text-gray-500">Located in your browser's address bar (top-left)</p>
-                      <div className="mt-1 flex gap-2">
-                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">Chrome: 🔒</span>
-                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">Firefox: 🛡️</span>
-                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">Edge: 🔒</span>
-                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">Safari: 🌐</span>
-                      </div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -155,10 +156,6 @@ const Hero = () => {
                     <div>
                       <p className="font-medium">Find 'Microphone' settings</p>
                       <p className="text-sm text-gray-500">Look for the microphone icon or text in site settings</p>
-                      <div className="mt-1 flex gap-2">
-                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">🎤 Microphone</span>
-                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">🎙️ Voice</span>
-                      </div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -166,10 +163,6 @@ const Hero = () => {
                     <div>
                       <p className="font-medium">Change to 'Allow'</p>
                       <p className="text-sm text-gray-500">Select 'Allow' from the dropdown menu</p>
-                      <div className="mt-1 flex gap-2">
-                        <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">✓ Allow</span>
-                        <span className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded">✗ Block</span>
-                      </div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -177,59 +170,20 @@ const Hero = () => {
                     <div>
                       <p className="font-medium">Refresh the page</p>
                       <p className="text-sm text-gray-500">Click the refresh button or press F5</p>
-                      <div className="mt-1 flex gap-2">
-                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">🔄 Refresh</span>
-                        <span className="text-xs px-2 py-1 bg-gray-100 rounded">F5</span>
-                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="text-sm text-gray-500 bg-blue-50 p-3 rounded-lg">
-                  <p className="font-medium text-blue-700 mb-1">Browser-specific tips:</p>
-                  <ul className="list-disc list-inside space-y-1">
-                    <li>Chrome: Look for the camera icon in the address bar</li>
-                    <li>Firefox: Click the shield icon in the address bar</li>
-                    <li>Edge: Look for the lock icon in the address bar</li>
-                    <li>Safari: Click the website icon in the address bar</li>
-                  </ul>
                 </div>
               </div>
             ),
             duration: 15000,
-            action: {
-              label: "Open Settings",
-              onClick: () => {
-                // Open browser settings
-                if (navigator.permissions && navigator.permissions.query) {
-                  navigator.permissions.query({ name: 'microphone' as PermissionName })
-                    .then(permissionStatus => {
-                      if (permissionStatus.state === 'denied') {
-                        // Show instructions for enabling microphone
-                        toast.info("Browser Settings", {
-                          description: (
-                            <div className="space-y-2">
-                              <p>Follow these steps to enable microphone access:</p>
-                              <ol className="list-decimal list-inside space-y-1">
-                                <li>Click the lock/info icon in your browser's address bar</li>
-                                <li>Find 'Microphone' in the site settings</li>
-                                <li>Change it to 'Allow'</li>
-                                <li>Refresh the page</li>
-                              </ol>
-                            </div>
-                          ),
-                          duration: 8000,
-                        });
-                      }
-                    });
-                }
-              },
-            },
           });
         }
       });
     } else {
+      setIsProcessing(true);
       voiceSearchInstance.stop();
       setIsListening(false);
+      setIsProcessing(false);
     }
   };
 
@@ -329,7 +283,10 @@ const Hero = () => {
                     <button
                       type="button"
                       onClick={toggleVoiceRecognition}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center ${isListening ? 'bg-destructive' : 'bg-gray-100'} text-gray-600`}
+                      disabled={isProcessing}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        isListening ? 'bg-destructive' : 'bg-gray-100'
+                      } text-gray-600 ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
                       aria-label="Voice search"
                     >
                       {isListening ? (
@@ -340,8 +297,6 @@ const Hero = () => {
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path d="M12 15C13.6569 15 15 13.6569 15 12V6C15 4.34315 13.6569 3 12 3C10.3431 3 9 4.34315 9 6V12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           <path d="M19 10V12C19 15.866 15.866 19 12 19C8.13401 19 5 15.866 5 12V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M12 19V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M8 22H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       )}
                     </button>
