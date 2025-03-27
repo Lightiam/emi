@@ -250,30 +250,41 @@ const Hero = () => {
           duration: 2000,
         });
         
+        // Call the search function with the query
         const results = await searchWithVoice({
+          query: searchQuery,
           language: selectedLanguage,
           translateToEnglish: true
         });
         
-        toast.success(`Found ${results.length} results matching your query`, {
-          description: "Search complete",
-          duration: 3000,
-        });
-        
-        // Navigate to worker details if exactly one worker is found
-        if (results.length === 1) {
-          navigate(`/worker/${results[0].id}`);
-        } else if (results.length > 1) {
-          // In a real app, we would show a list of results
-          // For now, just navigate to the first result
-          navigate(`/worker/${results[0].id}`);
+        if (results && results.length > 0) {
+          toast.success(`Found ${results.length} results matching your query`, {
+            description: "Search complete",
+            duration: 3000,
+          });
+          
+          // Navigate to search results page with the query
+          navigate(`/search?q=${encodeURIComponent(searchQuery)}`, {
+            state: { results, query: searchQuery }
+          });
+        } else {
+          toast.warning("No results found", {
+            description: "Try adjusting your search terms",
+            duration: 3000,
+          });
         }
       } catch (error) {
+        console.error('Search error:', error);
         toast.error("Search failed", {
-          description: "Could not complete your search request",
+          description: "Could not complete your search request. Please try again.",
           duration: 3000,
         });
       }
+    } else {
+      toast.warning("Please enter a search term", {
+        description: "Type or speak your search query",
+        duration: 3000,
+      });
     }
   };
 

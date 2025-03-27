@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import Index from "./pages/Index";
 import WorkerDetails from "./pages/WorkerDetails";
 import AllServicesPage from "./pages/AllServicesPage";
+import SearchResults from "./pages/SearchResults";
 import { initializeAuth } from "./utils/auth";
 import "./App.css";
 import { ThemeProvider } from "next-themes";
@@ -55,6 +56,7 @@ const App = () => {
               <Route path="/" element={<Index />} />
               <Route path="/worker/:id" element={<WorkerDetails />} />
               <Route path="/categories/all-services" element={<AllServicesPage />} />
+              <Route path="/search" element={<SearchResults />} />
               
               {/* Route all other paths back to the landing page */}
               <Route path="*" element={<Navigate to="/" replace />} />
