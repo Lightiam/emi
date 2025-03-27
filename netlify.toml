@@ -1,10 +1,9 @@
 [build]
   command = "npm run build"
   publish = "dist"
-  base = "/"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "18"
   NPM_VERSION = "10"
   VITE_API_URL = "https://api.dreamteamfinder.com"
   VITE_GROQ_API_KEY = "sk-1234567890abcdefghijklmnopqrstuvwxyz"
@@ -18,7 +17,6 @@
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
@@ -31,11 +29,6 @@
 
 [dev]
   command = "npm run dev"
-  port = 8080
-  targetPort = 8080
-  framework = "vite"
-  autoLaunch = true
-  publish = "dist"
   port = 8080
   targetPort = 8080
   framework = "vite"

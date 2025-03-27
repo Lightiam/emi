@@ -1,24 +1,4 @@
-import { translateToEnglish, translateFromEnglish, detectLanguage } from '../translation/googleTranslate';
+import { translateToEnglish as libreTranslateToEnglish, translateFromEnglish as libreTranslateFromEnglish, detectLanguage as libreDetectLanguage } from '../translation/libreTranslate';
 
-export { translateToEnglish, translateFromEnglish, detectLanguage };
-
-// Translation functions (simulated)
-export const translateToEnglish = (text: string, fromLanguage: string): string => {
-  // This is a mock implementation
-  // In a real app, this would use a translation service like Google Translate
-  
-  console.log(`Translating from ${fromLanguage} to English: ${text}`);
-  
-  // For demo purposes, we'll just return the original text
-  return text;
-};
-
-export const translateFromEnglish = (text: string, toLanguage: string): string => {
-  // This is a mock implementation
-  // In a real app, this would use a translation service
-  
-  console.log(`Translating from English to ${toLanguage}: ${text}`);
-  
-  // For demo purposes, we'll just return the original text
-  return text;
-};
+// Re-export the translation functions
+export { libreTranslateToEnglish as translateToEnglish, libreTranslateFromEnglish as translateFromEnglish, libreDetectLanguage as detectLanguage };
