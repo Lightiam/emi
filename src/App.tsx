@@ -9,8 +9,6 @@ import WorkerDetails from "./pages/WorkerDetails";
 import AllServicesPage from "./pages/AllServicesPage";
 import { initializeAuth } from "./utils/auth";
 import "./App.css";
-import EnvTest from "./components/EnvTest";
-import TranslationTest from "./components/TranslationTest";
 import { ThemeProvider } from "next-themes";
 
 // Create a React Query client
@@ -62,10 +60,6 @@ const App = () => {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
-          <div className="fixed bottom-4 right-4 space-y-4">
-            <EnvTest />
-            <TranslationTest />
-          </div>
         </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>
