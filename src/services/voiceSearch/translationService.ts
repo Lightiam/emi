@@ -1,6 +1,6 @@
 import { translateToEnglish as libreTranslateToEnglish, translateFromEnglish as libreTranslateFromEnglish, detectLanguage as libreDetectLanguage } from '../translation/libreTranslate';
 
-// Implement translation functions
+// Implement translation functions with unique names
 export const translateToEnglish = async (text: string, fromLanguage: string = 'auto'): Promise<string> => {
   try {
     return await libreTranslateToEnglish(text, fromLanguage);

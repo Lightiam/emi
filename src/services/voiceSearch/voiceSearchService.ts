@@ -8,6 +8,9 @@ export interface VoiceSearchOptions {
   language?: string;
   location?: string;
   translateToEnglish?: boolean;
+  onInterimResult?: (text: string) => void;
+  onResult?: (text: string) => void;
+  onError?: (error: Error) => void;
 }
 
 interface SpeechRecognitionEvent extends Event {
@@ -46,6 +49,7 @@ interface Window {
 class VoiceSearchService {
   private recognition: SpeechRecognition | null = null;
   private isListening: boolean = false;
+  private options: VoiceSearchOptions = {};
   
   constructor() {
     this.initRecognition();
@@ -61,33 +65,47 @@ class VoiceSearchService {
     if (SpeechRecognition) {
       this.recognition = new SpeechRecognition();
       this.recognition.continuous = false;
-      this.recognition.interimResults = false;
+      this.recognition.interimResults = true;
     } else {
       console.error('Speech recognition not supported in this browser');
     }
   }
   
-  startListening(options: VoiceSearchOptions = {}, callback: (result: string | null) => void) {
+  start(options: VoiceSearchOptions = {}) {
     if (!this.recognition) {
-      callback(null);
+      if (options.onError) {
+        options.onError(new Error('Speech recognition not supported in this browser'));
+      }
       return;
     }
     
     if (this.isListening) {
-      this.stopListening();
+      this.stop();
     }
     
+    this.options = options;
     const language = options.language || 'en';
     this.recognition.lang = language;
     
     this.recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      callback(transcript);
+      const results = event.results;
+      const lastResult = results[results.length - 1];
+      const transcript = lastResult[0].transcript;
+      
+      if (lastResult.isFinal) {
+        if (this.options.onResult) {
+          this.options.onResult(transcript);
+        }
+      } else if (this.options.onInterimResult) {
+        this.options.onInterimResult(transcript);
+      }
     };
     
     this.recognition.onerror = (event) => {
       console.error('Speech recognition error', event.error);
-      callback(null);
+      if (this.options.onError) {
+        this.options.onError(new Error(event.error));
+      }
     };
     
     this.recognition.onend = () => {
@@ -99,11 +117,13 @@ class VoiceSearchService {
       this.isListening = true;
     } catch (error) {
       console.error('Error starting speech recognition', error);
-      callback(null);
+      if (this.options.onError) {
+        this.options.onError(error as Error);
+      }
     }
   }
   
-  stopListening() {
+  stop() {
     if (this.recognition && this.isListening) {
       this.recognition.stop();
       this.isListening = false;
@@ -121,28 +141,31 @@ class VoiceSearchService {
     }
 
     return new Promise((resolve) => {
-      this.startListening(options, async (transcript) => {
-        if (!transcript) {
-          resolve([]);
-          return;
-        }
-        
-        const detectedLanguage = options.language || detectLanguage(transcript, options.location);
-        
-        // Translate if needed
-        let searchQuery = transcript;
-        if (options.translateToEnglish && detectedLanguage !== 'en') {
-          searchQuery = translateToEnglish(transcript, detectedLanguage);
-        }
-        
-        // Use GROQ for advanced search or fall back to regular search
-        try {
-          const results = await searchWithGroq(searchQuery, detectedLanguage);
-          resolve(results);
-        } catch (error) {
-          console.error('Error with AI search, falling back to regular search', error);
-          const results = await searchWorkers(searchQuery);
-          resolve(results);
+      this.start({
+        ...options,
+        onResult: async (transcript) => {
+          if (!transcript) {
+            resolve([]);
+            return;
+          }
+          
+          const detectedLanguage = options.language || detectLanguage(transcript, options.location);
+          
+          // Translate if needed
+          let searchQuery = transcript;
+          if (options.translateToEnglish && detectedLanguage !== 'en') {
+            searchQuery = await translateToEnglish(transcript, detectedLanguage);
+          }
+          
+          // Use GROQ for advanced search or fall back to regular search
+          try {
+            const results = await searchWithGroq(searchQuery, detectedLanguage);
+            resolve(results);
+          } catch (error) {
+            console.error('Error with AI search, falling back to regular search', error);
+            const results = await searchWorkers(searchQuery);
+            resolve(results);
+          }
         }
       });
     });

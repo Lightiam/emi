@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
@@ -120,8 +119,6 @@ const Hero = () => {
         onResult: async (text) => {
           setQuery(text);
           setIsListening(false);
-          
-          // Use the enhanced search with auto language detection if needed
           handleSearch(null, text);
         },
         onError: (error) => {
@@ -150,7 +147,11 @@ const Hero = () => {
           duration: 2000,
         });
         
-        const results = await searchWithVoice(searchQuery, selectedLanguage);
+        const results = await searchWithVoice({
+          language: selectedLanguage,
+          translateToEnglish: true
+        });
+        
         toast.success(`Found ${results.length} results matching your query`, {
           description: "Search complete",
           duration: 3000,
