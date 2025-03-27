@@ -1,8 +1,41 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  base = "/"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_VERSION = "10"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[functions]
+  directory = "netlify/functions"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[dev]
+  command = "npm run dev"
+  port = 8080
+  targetPort = 8080
+  framework = "vite"
+  autoLaunch = true
+  publish = "dist"
+  port = 8080
+  targetPort = 8080
+  framework = "vite"
+  autoLaunch = true
+  publish = "dist" 
