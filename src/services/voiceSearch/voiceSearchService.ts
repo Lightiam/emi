@@ -2,9 +2,10 @@
 import { detectLanguage } from './languageUtils';
 import { translateToEnglish } from './translationService';
 import { searchWorkers, searchWithGroq } from '../workers';
+import { toast } from 'sonner';
 
 // Define interfaces
-export interface VoiceSearchOptions {
+interface VoiceSearchOptions {
   language?: string;
   location?: string;
   translateToEnglish?: boolean;
@@ -46,131 +47,146 @@ interface Window {
   msSpeechRecognition: new () => SpeechRecognition;
 }
 
+// Define supported service types
+const supportedServices = [
+  'electrician',
+  'plumber',
+  'carpenter',
+  'painter',
+  'mason',
+  'technician',
+  'cleaner',
+  'gardener'
+];
+
+// Define simple commands
+const simpleCommands = {
+  'find': 'search',
+  'look for': 'search',
+  'search for': 'search',
+  'need': 'search',
+  'want': 'search',
+  'get': 'search'
+};
+
+interface SearchOptions {
+  query: string;
+  language?: string;
+  translateToEnglish?: boolean;
+}
+
+interface ServiceProvider {
+  id: string;
+  name: string;
+  title: string;
+  rating: number;
+  location: string;
+  imageUrl: string;
+}
+
+declare global {
+  interface Window {
+    webkitSpeechRecognition: new () => SpeechRecognition;
+  }
+}
+
 // Create a class to handle voice search functionality
 class VoiceSearchService {
   private recognition: SpeechRecognition | null = null;
   private isListening: boolean = false;
-  private options: VoiceSearchOptions = {};
-  
+  private onResultCallback: ((text: string) => void) | null = null;
+  private onErrorCallback: ((error: Error) => void) | null = null;
+  private onPermissionDeniedCallback: (() => void) | null = null;
+
   constructor() {
-    this.initRecognition();
-  }
-  
-  private initRecognition() {
-    // Try to get the SpeechRecognition object from various browser implementations
-    const SpeechRecognition = window.SpeechRecognition || 
-                            window.webkitSpeechRecognition || 
-                            window.mozSpeechRecognition || 
-                            window.msSpeechRecognition;
-
-    if (SpeechRecognition) {
-      this.recognition = new SpeechRecognition();
-      this.recognition.continuous = false;
-      this.recognition.interimResults = true;
-    } else {
-      console.error('Speech recognition not supported in this browser');
+    if ('webkitSpeechRecognition' in window) {
+      this.recognition = new window.webkitSpeechRecognition();
+      this.setupRecognition();
     }
   }
-  
-  async start(options: VoiceSearchOptions = {}) {
-    if (!this.recognition) {
-      if (options.onError) {
-        options.onError(new Error('Speech recognition not supported in this browser'));
-      }
-      return;
-    }
 
-    // Check for microphone permission
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach(track => track.stop()); // Stop the stream after permission check
-    } catch (error) {
-      if (options.onPermissionDenied) {
-        options.onPermissionDenied();
-      }
-      if (options.onError) {
-        options.onError(new Error('Microphone access denied. Please allow microphone access in your browser settings.'));
-      }
-      return;
-    }
-    
-    if (this.isListening) {
-      this.stop();
-    }
-    
-    this.options = options;
-    const language = options.language || 'en';
-    this.recognition.lang = language;
-    
-    this.recognition.onresult = (event) => {
-      const results = event.results;
-      const lastResult = results[results.length - 1];
-      const transcript = lastResult[0].transcript;
-      
-      if (lastResult.isFinal) {
-        if (this.options.onResult) {
-          this.options.onResult(transcript);
-        }
-      } else if (this.options.onInterimResult) {
-        this.options.onInterimResult(transcript);
+  private setupRecognition() {
+    if (!this.recognition) return;
+
+    this.recognition.continuous = false;
+    this.recognition.interimResults = false;
+    this.recognition.lang = 'en-US';
+
+    this.recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const transcript = event.results[0][0].transcript.toLowerCase();
+      this.processVoiceCommand(transcript);
+    };
+
+    this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      if (this.onErrorCallback) {
+        this.onErrorCallback(new Error(event.error));
       }
     };
-    
-    this.recognition.onerror = (event) => {
-      console.error('Speech recognition error', event.error);
-      if (this.options.onError) {
-        let errorMessage = 'An error occurred with voice recognition.';
-        switch (event.error) {
-          case 'not-allowed':
-            errorMessage = 'Microphone access denied. Please allow microphone access in your browser settings.';
-            break;
-          case 'no-speech':
-            errorMessage = 'No speech was detected. Please try again.';
-            break;
-          case 'aborted':
-            errorMessage = 'Voice recognition was aborted.';
-            break;
-          case 'audio-capture':
-            errorMessage = 'No microphone was found. Please connect a microphone and try again.';
-            break;
-          case 'network':
-            errorMessage = 'Network error occurred. Please check your connection.';
-            break;
-          case 'not-allowed':
-            errorMessage = 'Microphone access denied. Please allow microphone access in your browser settings.';
-            break;
-          case 'service-not-available':
-            errorMessage = 'Voice recognition service is not available. Please try again later.';
-            break;
-          default:
-            errorMessage = `Voice recognition error: ${event.error}`;
-        }
-        this.options.onError(new Error(errorMessage));
-      }
-    };
-    
+
     this.recognition.onend = () => {
       this.isListening = false;
     };
-    
+  }
+
+  private processVoiceCommand(transcript: string) {
+    // Check for simple commands
+    for (const [command, action] of Object.entries(simpleCommands)) {
+      if (transcript.includes(command)) {
+        // Extract the service type from the transcript
+        const serviceMatch = supportedServices.find(service => 
+          transcript.includes(service)
+        );
+
+        if (serviceMatch) {
+          // Found a valid service type
+          const command = `find ${serviceMatch}`;
+          if (this.onResultCallback) {
+            this.onResultCallback(command);
+          }
+          return;
+        }
+      }
+    }
+
+    // If no valid command or service found, show error
+    if (this.onErrorCallback) {
+      this.onErrorCallback(new Error('Please say "find" followed by a service type (e.g., "find plumber")'));
+    }
+  }
+
+  start(options: VoiceSearchOptions) {
+    if (!this.recognition) {
+      if (options.onError) {
+        options.onError(new Error('Speech recognition is not supported in this browser'));
+      }
+      return;
+    }
+
+    this.onResultCallback = options.onResult;
+    this.onErrorCallback = options.onError;
+    this.onPermissionDeniedCallback = options.onPermissionDenied;
+
+    if (options.language) {
+      this.recognition.lang = options.language;
+    }
+
     try {
       this.recognition.start();
       this.isListening = true;
     } catch (error) {
-      console.error('Error starting speech recognition', error);
-      if (this.options.onError) {
-        this.options.onError(error as Error);
+      if (options.onError) {
+        options.onError(new Error('Failed to start speech recognition'));
       }
     }
   }
-  
+
   stop() {
     if (this.recognition && this.isListening) {
       this.recognition.stop();
       this.isListening = false;
     }
   }
-  
+
   isSupported(): boolean {
     return !!this.recognition;
   }

@@ -112,11 +112,7 @@ const Hero = () => {
       setIsListening(true);
       
       voiceSearchInstance.start({
-        language: selectedLanguage,
-        onInterimResult: (text) => {
-          setQuery(text);
-        },
-        onResult: async (text) => {
+        onResult: (text) => {
           setQuery(text);
           setIsListening(false);
           handleSearch(null, text);
@@ -130,7 +126,6 @@ const Hero = () => {
         },
         onPermissionDenied: () => {
           setIsListening(false);
-          // Show a more user-friendly popup with browser-specific instructions
           toast.error("Microphone Access Required", {
             description: (
               <div className="space-y-4">
