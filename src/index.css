@@ -1,0 +1,147 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 20%;
+
+    --primary: 122 39% 49%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 20%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 120 44% 94%;
+    --accent-foreground: 122 39% 49%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 85%;
+    --ring: 122 39% 49%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  body {
+    @apply bg-[#f5f5f5] text-foreground antialiased;
+  }
+}
+
+@layer components {
+  .hero-search {
+    @apply flex w-full max-w-md mx-auto border border-[#ddd] rounded-full overflow-hidden px-6 py-3 focus-within:ring-1 focus-within:ring-primary transition-all duration-300;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+
+  .btn-outline {
+    @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
+  }
+
+  .btn-round {
+    @apply rounded-full;
+  }
+
+  .category-card {
+    @apply bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  .category-icon {
+    @apply w-12 h-12 bg-accent text-accent-foreground rounded-full flex items-center justify-center mx-auto mb-4;
+  }
+
+  .image-container {
+    @apply w-36 h-36 rounded-2xl overflow-hidden bg-gray-100 shadow-sm;
+  }
+
+  .image-container img {
+    @apply w-full h-full object-cover transition-transform duration-700 hover:scale-110;
+  }
+}
+
+/* Custom blur effects */
+.glass {
+  @apply backdrop-blur-md bg-white/80 border border-white/20;
+}
+
+/* Custom animations */
+.staggered-fade-in > * {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: staggerFadeIn 0.5s ease forwards;
+}
+
+.staggered-fade-in > *:nth-child(1) { animation-delay: 0.1s; }
+.staggered-fade-in > *:nth-child(2) { animation-delay: 0.2s; }
+.staggered-fade-in > *:nth-child(3) { animation-delay: 0.3s; }
+.staggered-fade-in > *:nth-child(4) { animation-delay: 0.4s; }
+.staggered-fade-in > *:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes staggerFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom styles for the images floating effect */
+.floating-images {
+  @apply relative;
+}
+
+.floating-images .left-images > div:nth-child(1) {
+  animation: image-float 7s ease-in-out infinite;
+}
+
+.floating-images .left-images > div:nth-child(2) {
+  animation: image-float 8s ease-in-out infinite 0.5s;
+}
+
+.floating-images .left-images > div:nth-child(3) {
+  animation: image-float 6s ease-in-out infinite 1s;
+}
+
+.floating-images .right-images > div:nth-child(1) {
+  animation: image-float 9s ease-in-out infinite 1.5s;
+}
+
+.floating-images .right-images > div:nth-child(2) {
+  animation: image-float 7s ease-in-out infinite 2s;
+}
+
+.floating-images .right-images > div:nth-child(3) {
+  animation: image-float 8s ease-in-out infinite 0.7s;
+}

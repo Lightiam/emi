@@ -1,0 +1,61 @@
+
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import Index from "./pages/Index";
+import WorkerDetails from "./pages/WorkerDetails";
+import AllServicesPage from "./pages/AllServicesPage";
+import { initializeAuth } from "./utils/auth";
+
+// Create a React Query client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+// ScrollToTop component to scroll to top on route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
+};
+
+const App = () => {
+  // Initialize demo users in localStorage
+  useEffect(() => {
+    initializeAuth();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner position="top-center" />
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/worker/:id" element={<WorkerDetails />} />
+            <Route path="/categories/all-services" element={<AllServicesPage />} />
+            
+            {/* Route all other paths back to the landing page */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
+
+export default App;
