@@ -130,9 +130,20 @@ const Hero = () => {
         },
         onPermissionDenied: () => {
           setIsListening(false);
-          toast.error("Microphone access denied", {
-            description: "Please allow microphone access in your browser settings to use voice search.",
-            duration: 5000,
+          // Show a more user-friendly popup with instructions
+          toast.error("Microphone Access Required", {
+            description: (
+              <div className="space-y-2">
+                <p>To use voice search, we need microphone access.</p>
+                <ol className="list-decimal list-inside space-y-1">
+                  <li>Click the lock/info icon in your browser's address bar</li>
+                  <li>Find 'Microphone' in the site settings</li>
+                  <li>Change it to 'Allow'</li>
+                  <li>Refresh the page</li>
+                </ol>
+              </div>
+            ),
+            duration: 8000,
             action: {
               label: "Open Settings",
               onClick: () => {
@@ -143,7 +154,17 @@ const Hero = () => {
                       if (permissionStatus.state === 'denied') {
                         // Show instructions for enabling microphone
                         toast.info("To enable microphone access:", {
-                          description: "1. Click the lock/info icon in your browser's address bar\n2. Find 'Microphone' in the site settings\n3. Change it to 'Allow'",
+                          description: (
+                            <div className="space-y-2">
+                              <p>Follow these steps to enable microphone access:</p>
+                              <ol className="list-decimal list-inside space-y-1">
+                                <li>Click the lock/info icon in your browser's address bar</li>
+                                <li>Find 'Microphone' in the site settings</li>
+                                <li>Change it to 'Allow'</li>
+                                <li>Refresh the page</li>
+                              </ol>
+                            </div>
+                          ),
                           duration: 8000,
                         });
                       }
