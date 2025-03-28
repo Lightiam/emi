@@ -106,3 +106,5 @@ For support, please open an issue in the GitHub repository or contact the mainta
 - [Shadcn UI](https://ui.shadcn.com/) for the beautiful components
 - [Tailwind CSS](https://tailwindcss.com/) for the styling system
 - [Vite](https://vitejs.dev/) for the build tool
+
+- 
